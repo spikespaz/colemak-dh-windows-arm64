@@ -22,6 +22,9 @@ $BuildRES = Join-Path $BuildDir "$SourceBase.RES"
 $BuildDLL = Join-Path $BuildDir "$OutputBase.dll"
 $OutputDLL = Join-Path $OutputDir "$OutputBase.dll"
 
+$InstallScript = Join-Path $ProjectRoot 'install.ps1'
+$UninstallScript = Join-Path $ProjectRoot 'uninstall.ps1'
+
 function Require-Command([string]$Name) {
     Get-Command $Name | Out-Null
 }
@@ -32,6 +35,8 @@ Require-Command rc.exe
 Require-Command link.exe
 
 if (-not (Test-Path $KlcPath)) { throw "KLC file not found: $KlcPath" }
+if (-not (Test-Path $InstallScript)) { throw "install.ps1 not found: $InstallScript" }
+if (-not (Test-Path $UninstallScript)) { throw "uninstall.ps1 not found: $UninstallScript" }
 
 Remove-Item $SourceDir, $BuildDir, $OutputDir -Recurse -Force -ErrorAction SilentlyContinue
 New-Item -ItemType Directory -Force $SourceDir, $BuildDir, $OutputDir | Out-Null
@@ -59,5 +64,7 @@ if ($LASTEXITCODE -ne 0) { throw "rc failed with exit code $LASTEXITCODE" }
 if ($LASTEXITCODE -ne 0) { throw "link failed with exit code $LASTEXITCODE" }
 
 Copy-Item $BuildDLL $OutputDLL -Force
+Copy-Item $InstallScript (Join-Path $OutputDir 'install.ps1') -Force
+Copy-Item $UninstallScript (Join-Path $OutputDir 'uninstall.ps1') -Force
 
 Write-Host "Built: $OutputDLL" -ForegroundColor Green

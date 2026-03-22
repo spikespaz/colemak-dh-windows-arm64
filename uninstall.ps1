@@ -11,13 +11,8 @@ param(
 $ErrorActionPreference = 'Stop'
 
 Add-Type -Namespace Win32 -Name Native -MemberDefinition @'
-using System;
-using System.Runtime.InteropServices;
-
-public static class Native {
-    [DllImport("kernel32.dll", SetLastError=true, CharSet=CharSet.Unicode)]
-    public static extern bool MoveFileEx(string lpExistingFileName, string lpNewFileName, int dwFlags);
-}
+[System.Runtime.InteropServices.DllImport("kernel32.dll", SetLastError=true, CharSet=System.Runtime.InteropServices.CharSet.Unicode)]
+public static extern bool MoveFileEx(string lpExistingFileName, string lpNewFileName, int dwFlags);
 '@
 
 function Move-FileOnReboot([string]$ExistingPath, [string]$NewPath = $null) {
