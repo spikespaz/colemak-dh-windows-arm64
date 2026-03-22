@@ -43,7 +43,8 @@ This repository: <https://github.com/spikespaz/colemak-dh-windows-arm64>
 1. Install [prerequisites](#prerequisites)
 2. Clone this repository
 3. Open PowerShell, `cd` to this project
-4. Run `./build.ps1` (change execution policy)
+2. Run `. .\shell.ps1`
+4. Run `.\build.ps1`
 
 Portable installer files are in `output/`.
 
