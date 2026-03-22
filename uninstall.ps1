@@ -5,13 +5,15 @@ param(
     [string]$UninstallKeyName = 'ColemakDH_US',
     [string]$InstallDir = "$env:ProgramFiles\Colemak-DH (US)",
     [switch]$RemoveFromCurrentUserPreload,
-	[switch]$Silent
+	[switch]$Silent,
+	[switch]$Elevated
 )
 
 $principal = New-Object Security.Principal.WindowsPrincipal `
     ([Security.Principal.WindowsIdentity]::GetCurrent())
 
-if (-not $principal.IsInRole([Security.Principal.WindowsBuiltinRole]::Administrator)) {
+if (-not $Elevated -and
+    -not $principal.IsInRole([Security.Principal.WindowsBuiltinRole]::Administrator)) {
 
     if (-not $Silent) {
         Write-Host "Requesting administrative privileges..."
@@ -20,11 +22,15 @@ if (-not $principal.IsInRole([Security.Principal.WindowsBuiltinRole]::Administra
 
     $argumentList = @(
         '-ExecutionPolicy', 'Bypass',
-        '-File', $PSCommandPath
+        '-File', $PSCommandPath,
+        '-Elevated'
     )
 
     foreach ($entry in $PSBoundParameters.GetEnumerator()) {
+        if ($entry.Key -in @('Elevated')) { continue }
+
         $argumentList += "-$($entry.Key)"
+
         if ($entry.Value -isnot [System.Management.Automation.SwitchParameter]) {
             $argumentList += [string]$entry.Value
         }
