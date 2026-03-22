@@ -17,9 +17,22 @@ This repository: <https://github.com/spikespaz/colemak-dh-windows-arm64>
 2. Change the "Architecture" column to `arm64`
 3. Download
 4. Open PowerShell, and `cd ~\Downloads`
-5. Run [this command](#vs-build-tools-install-command)
+5. Run [VS Build Tools Install Command](#vs-build-tools-install-command)
 5. Visit <https://www.microsoft.com/en-us/download/details.aspx?id=102134>
 6. Download, run (extract), and start `setup.exe`
+
+<details>
+<summary id="vs-build-tools-install-command"><b>VS Build Tools Install Command</b></summary>
+
+```ps
+.\vs_BuildTools.exe `
+   --add Microsoft.VisualStudio.Component.VC.CoreBuildTools `
+   --add Microsoft.VisualStudio.Component.VC.Tools.ARM64 `
+   --add Microsoft.Component.MSBuild `
+   --add Microsoft.VisualStudio.Component.Windows11SDK.22621 `
+   --passive --wait --norestart
+```
+</details>
 
 ## Building:
 
@@ -44,14 +57,3 @@ You can now switch between your default layout and Colemak-DH with <kbd>Super</k
 
 You can uninstall the layout the same way as with any other program.
 Go to *Settings* > *Apps* > *Installed apps* > scroll to *Colemak-DH (US)* > *...* > *Uninstall*, then reboot.
-
-### VS Build Tools Install Command
-
-```ps
-.\vs_BuildTools.exe `
-   --add Microsoft.VisualStudio.Component.VC.CoreBuildTools `
-   --add Microsoft.VisualStudio.Component.VC.Tools.ARM64 `
-   --add Microsoft.Component.MSBuild `
-   --add Microsoft.VisualStudio.Component.Windows11SDK.22621 `
-   --passive --wait --norestart
-```
