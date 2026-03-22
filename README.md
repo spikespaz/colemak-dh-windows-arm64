@@ -12,14 +12,13 @@ This repository: <https://github.com/spikespaz/colemak-dh-windows-arm64>
 
 ## Prerequisites:
 
+### Visual Studio Build Tools for ARM64
+
 1. Visit <https://my.visualstudio.com/downloads>
 2. Search "Build Tools for Visual Studio 2026"
-2. Change the "Architecture" column to `arm64`
-3. Download
-4. Open PowerShell, and `cd ~\Downloads`
-5. Run [VS Build Tools Install Command](#vs-build-tools-install-command)
-5. Visit <https://www.microsoft.com/en-us/download/details.aspx?id=102134>
-6. Download, run (extract), and start `setup.exe`
+3. Change the "Architecture" column to `arm64`, download
+5. Open PowerShell, and `cd ~\Downloads`
+6. Run [VS Build Tools Install Command](#vs-build-tools-install-command)
 
 <details>
 <summary id="vs-build-tools-install-command"><b>VS Build Tools Install Command</b></summary>
@@ -33,6 +32,11 @@ This repository: <https://github.com/spikespaz/colemak-dh-windows-arm64>
    --passive --wait --norestart
 ```
 </details>
+
+### Microsoft Keyboard Layout Creator 1.4
+
+1. Visit <https://www.microsoft.com/en-us/download/details.aspx?id=102134>
+2. Download, run (extract), and start `setup.exe`
 
 ## Building:
 
