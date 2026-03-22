@@ -120,7 +120,7 @@ if (Test-Path $TargetDll) {
 }
 
 $cleanupCmd = @"
-ping 127.0.0.1 -n 3 >nul
+timeout /t 2 /nobreak >nul
 del /f /q "$InstalledUninstallScript"
 rmdir "$InstallDir" 2>nul
 "@
