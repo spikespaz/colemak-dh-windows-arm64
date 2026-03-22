@@ -1,11 +1,10 @@
-#Requires -RunAsAdministrator
 [CmdletBinding()]
 param(
     [string]$DllName = 'colemak_dh_ansi_us.dll',
     [string]$LayoutKey = 'a0010409',
     [string]$LayoutText = 'Colemak-DH (US)',
     [string]$LayoutId = '00f8',
-    [string]$UninstallKeyName = 'ColemakDHUS',
+    [string]$UninstallKeyName = 'ColemakDH_US',
     [string]$InstallDir = "$env:ProgramFiles\Colemak-DH (US)",
     [switch]$AddToCurrentUserPreload
 )
