@@ -6,8 +6,12 @@ param(
     [string]$LayoutId = '00f8',
     [string]$UninstallKeyName = 'ColemakDH_US',
     [string]$InstallDir = "$env:ProgramFiles\Colemak-DH (US)",
-    [switch]$AddToCurrentUserPreload
+    [switch]$AddToCurrentUserPreload,
+	[switch]$Silent
 )
+
+$principal = New-Object Security.Principal.WindowsPrincipal `
+    ([Security.Principal.WindowsIdentity]::GetCurrent())
 
 $principal = New-Object Security.Principal.WindowsPrincipal `
     ([Security.Principal.WindowsIdentity]::GetCurrent())
@@ -17,8 +21,10 @@ $principal = New-Object Security.Principal.WindowsPrincipal `
 
 if (-not $principal.IsInRole([Security.Principal.WindowsBuiltinRole]::Administrator)) {
 
-    Write-Host "Requesting administrative privileges..."
-    Write-Host "Waiting for elevated process to complete..."
+    if (-not $Silent) {
+        Write-Host "Requesting administrative privileges..."
+        Write-Host "Waiting for elevated process to complete..."
+    }
 
     $argumentList = @(
         '-ExecutionPolicy', 'Bypass',
@@ -38,8 +44,11 @@ if (-not $principal.IsInRole([Security.Principal.WindowsBuiltinRole]::Administra
         -Wait `
         -PassThru
 
-    Write-Host ""
-    Write-Host "Elevated process exited with code $($proc.ExitCode)"
+    if (-not $Silent) {
+        Write-Host ""
+        Write-Host "Elevated process exited with code $($proc.ExitCode)"
+        Read-Host "Press Enter to close"
+    }
 
     exit $proc.ExitCode
 }
@@ -159,5 +168,8 @@ New-ItemProperty -Path $UninstallRegPath -Name 'DisplayIcon'          -PropertyT
 New-ItemProperty -Path $UninstallRegPath -Name 'NoModify'             -PropertyType DWord  -Value 1 -Force | Out-Null
 New-ItemProperty -Path $UninstallRegPath -Name 'NoRepair'             -PropertyType DWord  -Value 1 -Force | Out-Null
 
-Write-Host "Installed or repaired." -ForegroundColor Green
-Write-Host "Sign out and sign back in, or reboot, if the layout was in use." -ForegroundColor Green
+if (-not $Silent) {
+    Write-Host "Installed or repaired." -ForegroundColor Green
+    Write-Host "Sign out and sign back in, or reboot, if the layout was in use." -ForegroundColor Green
+    Read-Host "Press Enter to close"
+}

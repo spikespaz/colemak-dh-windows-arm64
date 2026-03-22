@@ -4,19 +4,19 @@ param(
     [string]$LayoutKey = 'a0010409',
     [string]$UninstallKeyName = 'ColemakDH_US',
     [string]$InstallDir = "$env:ProgramFiles\Colemak-DH (US)",
-    [switch]$RemoveFromCurrentUserPreload
+    [switch]$RemoveFromCurrentUserPreload,
+	[switch]$Silent
 )
-
-$principal = New-Object Security.Principal.WindowsPrincipal `
-    ([Security.Principal.WindowsIdentity]::GetCurrent())
 
 $principal = New-Object Security.Principal.WindowsPrincipal `
     ([Security.Principal.WindowsIdentity]::GetCurrent())
 
 if (-not $principal.IsInRole([Security.Principal.WindowsBuiltinRole]::Administrator)) {
 
-    Write-Host "Requesting administrative privileges..."
-    Write-Host "Waiting for elevated process to complete..."
+    if (-not $Silent) {
+        Write-Host "Requesting administrative privileges..."
+        Write-Host "Waiting for elevated process to complete..."
+    }
 
     $argumentList = @(
         '-ExecutionPolicy', 'Bypass',
@@ -36,8 +36,11 @@ if (-not $principal.IsInRole([Security.Principal.WindowsBuiltinRole]::Administra
         -Wait `
         -PassThru
 
-    Write-Host ""
-    Write-Host "Elevated process exited with code $($proc.ExitCode)"
+    if (-not $Silent) {
+        Write-Host ""
+        Write-Host "Elevated process exited with code $($proc.ExitCode)"
+        Read-Host "Press Enter to close"
+    }
 
     exit $proc.ExitCode
 }
@@ -125,5 +128,8 @@ rmdir "$InstallDir" 2>nul
 
 Start-Process -FilePath cmd.exe -ArgumentList '/c', $cleanupCmd -WindowStyle Hidden
 
-Write-Host "Uninstalled." -ForegroundColor Green
-Write-Host "If the DLL was in use, reboot to complete removal." -ForegroundColor Green
+if (-not $Silent) {
+    Write-Host "Uninstalled." -ForegroundColor Green
+    Write-Host "If the DLL was in use, reboot to complete removal." -ForegroundColor Green
+    Read-Host "Press Enter to close"
+}
