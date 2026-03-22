@@ -7,6 +7,31 @@ param(
     [switch]$RemoveFromCurrentUserPreload
 )
 
+$principal = New-Object Security.Principal.WindowsPrincipal `
+    ([Security.Principal.WindowsIdentity]::GetCurrent())
+
+if (-not $principal.IsInRole([Security.Principal.WindowsBuiltinRole]::Administrator)) {
+    Write-Host "Requesting administrative privileges..."
+
+    $argumentList = @(
+        '-ExecutionPolicy', 'Bypass',
+        '-File', $PSCommandPath
+    )
+
+    foreach ($entry in $PSBoundParameters.GetEnumerator()) {
+        $argumentList += "-$($entry.Key)"
+        if ($entry.Value -isnot [switch] -and $entry.Value -isnot [System.Management.Automation.SwitchParameter]) {
+            $argumentList += [string]$entry.Value
+        } elseif ($entry.Value.IsPresent) {
+        } else {
+            $argumentList = $argumentList[0..($argumentList.Count - 2)]
+        }
+    }
+
+    Start-Process powershell.exe -Verb RunAs -ArgumentList $argumentList
+    exit
+}
+
 $ErrorActionPreference = 'Stop'
 
 Add-Type -Namespace Win32 -Name Native -MemberDefinition @'
