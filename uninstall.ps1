@@ -39,7 +39,6 @@ if (-not $principal.IsInRole([Security.Principal.WindowsBuiltinRole]::Administra
     if (-not $Silent) {
         Write-Host ""
         Write-Host "Elevated process exited with code $($proc.ExitCode)"
-        Read-Host "Press Enter to close"
     }
 
     exit $proc.ExitCode
