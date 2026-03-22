@@ -12,8 +12,13 @@ param(
 $principal = New-Object Security.Principal.WindowsPrincipal `
     ([Security.Principal.WindowsIdentity]::GetCurrent())
 
+$principal = New-Object Security.Principal.WindowsPrincipal `
+    ([Security.Principal.WindowsIdentity]::GetCurrent())
+
 if (-not $principal.IsInRole([Security.Principal.WindowsBuiltinRole]::Administrator)) {
+
     Write-Host "Requesting administrative privileges..."
+    Write-Host "Waiting for elevated process to complete..."
 
     $argumentList = @(
         '-ExecutionPolicy', 'Bypass',
@@ -22,16 +27,21 @@ if (-not $principal.IsInRole([Security.Principal.WindowsBuiltinRole]::Administra
 
     foreach ($entry in $PSBoundParameters.GetEnumerator()) {
         $argumentList += "-$($entry.Key)"
-        if ($entry.Value -isnot [switch] -and $entry.Value -isnot [System.Management.Automation.SwitchParameter]) {
+        if ($entry.Value -isnot [System.Management.Automation.SwitchParameter]) {
             $argumentList += [string]$entry.Value
-        } elseif ($entry.Value.IsPresent) {
-        } else {
-            $argumentList = $argumentList[0..($argumentList.Count - 2)]
         }
     }
 
-    Start-Process powershell.exe -Verb RunAs -ArgumentList $argumentList
-    exit
+    $proc = Start-Process powershell.exe `
+        -Verb RunAs `
+        -ArgumentList $argumentList `
+        -Wait `
+        -PassThru
+
+    Write-Host ""
+    Write-Host "Elevated process exited with code $($proc.ExitCode)"
+
+    exit $proc.ExitCode
 }
 
 $ErrorActionPreference = 'Stop'
