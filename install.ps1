@@ -156,6 +156,7 @@ if ($AddToCurrentUserPreload) {
 }
 
 $uninstallCmd = "powershell.exe -ExecutionPolicy Bypass -File `"$InstalledUninstallScript`" -DllName `"$DllName`" -LayoutKey `"$LayoutKey`" -UninstallKeyName `"$UninstallKeyName`" -InstallDir `"$InstallDir`""
+$quietUninstallCmd = "powershell.exe -ExecutionPolicy Bypass -File `"$InstalledUninstallScript`" -Silent -DllName `"$DllName`" -LayoutKey `"$LayoutKey`" -UninstallKeyName `"$UninstallKeyName`" -InstallDir `"$InstallDir`""
 
 New-Item -Path $UninstallRegPath -Force | Out-Null
 New-ItemProperty -Path $UninstallRegPath -Name 'DisplayName'          -PropertyType String -Value $LayoutText -Force | Out-Null
@@ -163,7 +164,7 @@ New-ItemProperty -Path $UninstallRegPath -Name 'DisplayVersion'       -PropertyT
 New-ItemProperty -Path $UninstallRegPath -Name 'Publisher'            -PropertyType String -Value 'Jacob Birkett' -Force | Out-Null
 New-ItemProperty -Path $UninstallRegPath -Name 'InstallLocation'      -PropertyType String -Value $InstallDir -Force | Out-Null
 New-ItemProperty -Path $UninstallRegPath -Name 'UninstallString'      -PropertyType String -Value $uninstallCmd -Force | Out-Null
-New-ItemProperty -Path $UninstallRegPath -Name 'QuietUninstallString' -PropertyType String -Value $uninstallCmd -Force | Out-Null
+New-ItemProperty -Path $UninstallRegPath -Name 'QuietUninstallString' -PropertyType String -Value $quietUninstallCmd -Force | Out-Null
 New-ItemProperty -Path $UninstallRegPath -Name 'DisplayIcon'          -PropertyType String -Value $TargetDll -Force | Out-Null
 New-ItemProperty -Path $UninstallRegPath -Name 'NoModify'             -PropertyType DWord  -Value 1 -Force | Out-Null
 New-ItemProperty -Path $UninstallRegPath -Name 'NoRepair'             -PropertyType DWord  -Value 1 -Force | Out-Null
