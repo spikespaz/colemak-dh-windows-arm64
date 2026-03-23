@@ -11,6 +11,7 @@ $OutputDir = Join-Path $ProjectRoot 'output'
 
 $SourceBase = 'cdh_us'
 $OutputBase = 'colemak_dh_ansi_us'
+$OutputArch = "arm64"
 
 $SourceC   = Join-Path $SourceDir "$SourceBase.C"
 $SourceRC  = Join-Path $SourceDir "$SourceBase.RC"
@@ -68,3 +69,12 @@ Copy-Item $InstallScript (Join-Path $OutputDir 'install.ps1') -Force
 Copy-Item $UninstallScript (Join-Path $OutputDir 'uninstall.ps1') -Force
 
 Write-Host "Built: $OutputDLL" -ForegroundColor Green
+
+$ArchivePath = Join-Path $OutputDir "$OutputBase-${OutputArch}.zip"
+
+Compress-Archive `
+    -Path (Join-Path $OutputDir '*') `
+    -DestinationPath $ArchivePath `
+    -CompressionLevel Optimal
+
+Write-Host "Archived: $ArchivePath" -ForegroundColor Green
