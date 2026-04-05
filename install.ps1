@@ -82,9 +82,11 @@ function Ensure-Dir([string]$Path) {
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $SourceDll = Join-Path $ScriptDir $DllName
 $SourceUninstallScript = Join-Path $ScriptDir 'uninstall.ps1'
+$SourceNote = Join-Path $ScriptDir 'NOTE.txt'
 
 $TargetDll = Join-Path $env:WINDIR "System32\$DllName"
 $InstalledUninstallScript = Join-Path $InstallDir 'uninstall.ps1'
+$InstalledNote = Join-Path $InstallDir 'NOTE.txt'
 
 $LayoutRegPath = "HKLM:\SYSTEM\CurrentControlSet\Control\Keyboard Layouts\$LayoutKey"
 $PreloadRegPath = "HKCU:\Keyboard Layout\Preload"
@@ -108,6 +110,7 @@ if ($targetExists -and $targetHash -eq $sourceHash -and $layoutOwned -and $unins
 } else {
     Ensure-Dir $InstallDir
     Copy-Item $SourceUninstallScript $InstalledUninstallScript -Force
+    if (Test-Path $SourceNote) { Copy-Item $SourceNote $InstalledNote -Force }
 
     if ($targetExists -and -not $layoutOwned -and -not $uninstallOwned) {
         throw "A different unmanaged DLL already exists at $TargetDll"
@@ -167,7 +170,9 @@ New-ItemProperty -Path $UninstallRegPath -Name 'QuietUninstallString' -PropertyT
 New-ItemProperty -Path $UninstallRegPath -Name 'DisplayIcon'          -PropertyType String -Value "$env:WINDIR\System32\ddores.dll,30" -Force | Out-Null
 New-ItemProperty -Path $UninstallRegPath -Name 'NoModify'             -PropertyType DWord  -Value 1 -Force | Out-Null
 New-ItemProperty -Path $UninstallRegPath -Name 'NoRepair'             -PropertyType DWord  -Value 1 -Force | Out-Null
-New-ItemProperty -Path $UninstallRegPath -Name 'EstimatedSize'        -PropertyType DWord  -Value ([math]::Ceiling((Get-Item $SourceDll).Length / 1KB)) -Force | Out-Null
+$installedBytes = (Get-Item $SourceDll).Length + (Get-Item $SourceUninstallScript).Length
+if (Test-Path $SourceNote) { $installedBytes += (Get-Item $SourceNote).Length }
+New-ItemProperty -Path $UninstallRegPath -Name 'EstimatedSize'        -PropertyType DWord  -Value ([math]::Ceiling($installedBytes / 1KB)) -Force | Out-Null
 
 if (-not $Silent) {
     Write-Host "Installed or repaired." -ForegroundColor Green
