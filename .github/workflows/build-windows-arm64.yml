@@ -68,4 +68,5 @@ jobs:
             output/colemak_dh_ansi_us.dll
             output/install.ps1
             output/uninstall.ps1
+            output/NOTE.txt
           if-no-files-found: error

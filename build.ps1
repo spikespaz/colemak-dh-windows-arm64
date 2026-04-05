@@ -70,6 +70,14 @@ Copy-Item $BuildDLL $OutputDLL -Force
 Copy-Item $InstallScript (Join-Path $OutputDir 'install.ps1') -Force
 Copy-Item $UninstallScript (Join-Path $OutputDir 'uninstall.ps1') -Force
 
+$NoteFile = Join-Path $OutputDir 'NOTE.txt'
+@"
+The file $OutputBase.dll included here is a reference copy of the DLL
+installed to %WINDIR%\System32. It is not used at runtime.
+
+Source: https://github.com/spikespaz/colemak-dh-windows-arm64
+"@ | Set-Content -Path $NoteFile -Encoding UTF8
+
 Write-Host "Built: $OutputDLL" -ForegroundColor Green
 
 if (-not $SkipArchive) {
