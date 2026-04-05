@@ -120,8 +120,9 @@ if (Test-Path $TargetDll) {
         Remove-Item $TargetDll -Force
     }
     catch {
-        Write-Warning "Could not remove DLL immediately. Scheduled deletion on reboot."
-        Write-Warning "You must reboot before reinstalling the layout."
+        Write-Warning "Could not remove DLL — it is in use."
+        Write-Warning "Switch to another layout (Super+Space), then run this uninstaller again,"
+        Write-Warning "or reboot to complete removal."
         Move-FileOnReboot $TargetDll
     }
 }
@@ -139,6 +140,8 @@ Start-Process -FilePath cmd.exe -ArgumentList '/c', $cleanupCmd -WindowStyle Hid
 
 if (-not $Silent) {
     Write-Host "Uninstalled." -ForegroundColor Green
-    Write-Host "If the DLL was in use, reboot to complete removal." -ForegroundColor Green
+    if (Test-Path $TargetDll) {
+        Write-Host "DLL is pending deletion — reboot or switch layout and uninstall again." -ForegroundColor Yellow
+    }
     Read-Host "Press Enter to close"
 }
