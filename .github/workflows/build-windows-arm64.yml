@@ -1,0 +1,68 @@
+name: build-windows-arm64
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-11-arm
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install MSKLC
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+
+          $kbdutoolDst = 'C:\Program Files (x86)\Microsoft Keyboard Layout Creator 1.4\bin\i386'
+          $downloadUrl = 'https://download.microsoft.com/download/6/f/5/6f5ce43a-e892-4fd1-b9a6-1a0cbb64e6e2/MSKLC.exe'
+          $root        = Join-Path $env:RUNNER_TEMP 'MSKLC'
+          $extractDir  = Join-Path $root 'extracted'
+          $msiPath     = Join-Path $extractDir 'MSKLC\MSKLC.msi'
+          $installDir  = Join-Path $root 'install'
+          $msiLog      = Join-Path $root 'msi.log'
+
+          New-Item -ItemType Directory -Force $root, $extractDir | Out-Null
+          Invoke-WebRequest $downloadUrl -OutFile "$root\MSKLC.exe"
+
+          # GUI self-extractor — must use Start-Process -Wait
+          Start-Process "$root\MSKLC.exe" -ArgumentList '-y', "-o$extractDir" -Wait
+
+          if (-not (Test-Path $msiPath)) { throw "MSKLC.msi not found" }
+
+          # Admin install (/a) bypasses .NET 3.5 LaunchConditions
+          $p = Start-Process msiexec.exe `
+            -ArgumentList "/a `"$msiPath`" /qn TARGETDIR=`"$installDir`" /L*V `"$msiLog`"" `
+            -Wait -PassThru
+
+          if ($p.ExitCode -notin 0, 3010) {
+            if (Test-Path $msiLog) { Get-Content $msiLog -Tail 50 }
+            throw "msiexec /a failed with exit code $($p.ExitCode)"
+          }
+
+          # Copy kbdutool to expected location
+          $src = Get-ChildItem $installDir -Recurse -Filter 'kbdutool.exe' | Select-Object -First 1
+          if (-not $src) { throw "kbdutool.exe not found after install" }
+
+          New-Item -ItemType Directory -Force $kbdutoolDst | Out-Null
+          Copy-Item "$($src.DirectoryName)\*" $kbdutoolDst -Force
+
+      - name: Build
+        shell: pwsh
+        run: |
+          . .\shell.ps1
+          .\build.ps1 -SkipArchive
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: colemak_dh_ansi_us-arm64
+          path: |
+            output/colemak_dh_ansi_us.dll
+            output/install.ps1
+            output/uninstall.ps1
+          if-no-files-found: error
