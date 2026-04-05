@@ -151,3 +151,10 @@ for branch in "${branches[@]}"; do
     parent="$branch"
     ((i++))
 done
+
+echo
+echo "WARNING: Merge strictly in the order above. PR bases point to"
+echo "prerequisite branches — merging out of order lands commits on a"
+echo "feature branch, not main. After merging each PR, GitHub should"
+echo "auto-retarget the next. If it doesn't, run:"
+echo "  gh pr edit <number> --base main"
