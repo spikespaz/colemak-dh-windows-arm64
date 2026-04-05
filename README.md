@@ -48,12 +48,24 @@ This repository: <https://github.com/spikespaz/colemak-dh-windows-arm64>
 
 Portable installer files are in `output/`.
 
-## Installing:
+## Installing
+
+### From CI artifact
+
+Pre-built installer files are available from the [latest CI run](https://github.com/spikespaz/colemak-dh-windows-arm64/actions/workflows/build-windows-arm64.yml). Download the `colemak_dh_ansi_us-arm64` artifact, extract it, and run:
+
+```ps
+powershell -ExecutionPolicy Bypass -File .\install.ps1
+```
+
+Then reboot.
+
+### From source
 
 1. Open PowerShell, `cd` to this project
 2. [Build `colemak_dh_ansi_us.dll`](#building)
 3. Run `cd output`
-4. Run `.\install.ps1`
+4. Run `powershell -ExecutionPolicy Bypass -File .\install.ps1`
 5. Reboot
 
 You can now switch between your default layout and Colemak-DH with <kbd>Super</kbd>+<kbd>Space</kbd>.
