@@ -112,20 +112,19 @@ if ($targetExists -and $targetHash -eq $sourceHash -and $layoutOwned -and $unins
     Copy-Item $SourceUninstallScript $InstalledUninstallScript -Force
     if (Test-Path $SourceNote) { Copy-Item $SourceNote $InstalledNote -Force }
 
-    if ($targetExists -and -not $layoutOwned -and -not $uninstallOwned) {
-        throw "A different unmanaged DLL already exists at $TargetDll"
-    }
-
     if (-not $targetExists) {
         Copy-Item $SourceDll $TargetDll -Force
-    } elseif ($targetHash -ne $sourceHash) {
-        $stagedDll = Join-Path $InstallDir $DllName
-        Copy-Item $SourceDll $stagedDll -Force
-
+    } else {
         try {
             Copy-Item $SourceDll $TargetDll -Force
         }
         catch {
+            if (-not $layoutOwned -and -not $uninstallOwned) {
+                throw "$DllName is pending deletion from a previous uninstall. Reboot before reinstalling."
+            }
+
+            $stagedDll = Join-Path $InstallDir $DllName
+            Copy-Item $SourceDll $stagedDll -Force
             Write-Warning "Could not replace loaded DLL immediately. Scheduled replacement on reboot."
             Move-FileOnReboot $stagedDll $TargetDll
         }
