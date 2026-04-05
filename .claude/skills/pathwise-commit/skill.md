@@ -307,6 +307,12 @@ hm-mod: monitors: size: make this option readOnly
 - **Do not use `ci:` as a path segment.** If the repository has CI configuration outside `.github/workflows/` (e.g., `.circleci/`, `.gitlab-ci.yml`), use the actual directory or file as the segment.
 - **Common verbs**: `init`, `add`, `remove`, `restrict`, `enable`, `disable`, `pin`.
 
+### PowerShell / Windows
+
+- **Script files are bare segments** by base name: `shell:`, `build:`, `install:`, not `shell.ps1:`.
+- **Parameters as path segments** when they are the locus of change: `build: -SkipArchive: add` or simply `build: add -SkipArchive parameter` — either form is valid. Prefer whichever reads most naturally in `git log --oneline`.
+- **Common verbs**: `add`, `remove`, `find`, `enforce`, `bypass`, `enable`, `disable`.
+
 ## Temporary Commits and Rebase Prefixes
 
 Pathwise summaries integrate naturally with `rebase`-centric workflows. During a session, the agent may create **temporary commits** — small, incremental snapshots of work that are not yet final. These use single-letter prefixes matching `git rebase -i` commands to signal their intended fate:
