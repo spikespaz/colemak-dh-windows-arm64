@@ -113,6 +113,16 @@ After any rebase or restructure, update:
 - PR bodies with current merge order and predecessor references
 - PR base branches if the stack order changed
 
+## Audit on every commit
+
+Every commit created or modified during stacking must pass a pathwise audit (see `pathwise-audit` skill) before it is pushed. This applies to:
+
+- New commits written during the session
+- Commits whose summary changed during a reword or rebase
+- Commits that gained or lost hunks during a split or squash
+
+Run the "and" test and path test before committing. After a rebase that rewords or squashes, spot-check the affected summaries against their diffs.
+
 ## What NOT to do
 
 - Do **not** let development branches accumulate commits from multiple PRs — this is the anti-pattern stacking solves.
