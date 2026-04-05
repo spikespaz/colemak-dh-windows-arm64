@@ -26,3 +26,13 @@ The skill file teaches the format. These guidelines teach judgment:
 - **The history is the deliverable.** A clean history with well-scoped commits is more valuable than the final file state. When in doubt, make the history more granular, not less.
 - **Never assume the environment.** Ask before using tools, interpreters, or services that haven't been confirmed available. This applies to subagents too.
 - **Always end files with a newline.** Every file must have a trailing newline at EOF. No exceptions.
+- **Audit your own commits.** The pathwise-audit skill applies to commits you produce, not just commits you review. Before every commit, test the summary against the full pathwise-commit spec — not just the "and" test, but naming, phrasing, granularity, mechanical consequences, and the "What NOT To Do" list. Do this incrementally: audit each commit as it is created or changed.
+
+## CI and Branch Management
+
+- **Push and iterate autonomously on feature branches.** Do not ask for confirmation before pushing, force-pushing (with lease), or re-running CI on non-main branches. The user expects you to drive the feedback loop.
+- **Clean up after merge.** Delete merged branches (local and remote) and rebase remaining branches onto updated master.
+
+## Skill Provenance
+
+The `pathwise-commit` and `pathwise-audit` skills originate from [spikespaz/claude](https://github.com/spikespaz/claude). When updating these skills, check the source repo for newer versions.
