@@ -25,3 +25,13 @@ The skill file teaches the format. These guidelines teach judgment:
 - **Granularity is the real discipline.** The format is easy. Committing every edit, immediately, with the right scope — that is the hard part. Default to smaller commits. If you catch yourself batching, stop and commit what you have.
 - **The history is the deliverable.** A clean history with well-scoped commits is more valuable than the final file state. When in doubt, make the history more granular, not less.
 - **Never assume the environment.** Ask before using tools, interpreters, or services that haven't been confirmed available. This applies to subagents too.
+- **Audit your own commits.** The pathwise-audit skill applies to commits you produce, not just commits you review. Run the "and" test and path test before every commit — violations in your own work are the same as violations in anyone else's.
+
+## CI and Branch Management
+
+- **Push and iterate autonomously on feature branches.** Do not ask for confirmation before pushing, force-pushing (with lease), or re-running CI on non-main branches. The user expects you to drive the feedback loop.
+- **Clean up after merge.** Delete merged branches (local and remote) and rebase remaining branches onto updated master.
+
+## Skill Provenance
+
+The `pathwise-commit` and `pathwise-audit` skills originate from [spikespaz/claude](https://github.com/spikespaz/claude). When updating these skills, check the source repo for newer versions.

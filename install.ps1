@@ -24,7 +24,7 @@ if (-not $Elevated -and
 
     $argumentList = @(
         '-ExecutionPolicy', 'Bypass',
-        '-File', $PSCommandPath,
+        '-File', "`"$PSCommandPath`"",
         '-Elevated'
     )
 
@@ -34,7 +34,7 @@ if (-not $Elevated -and
         $argumentList += "-$($entry.Key)"
 
         if ($entry.Value -isnot [System.Management.Automation.SwitchParameter]) {
-            $argumentList += [string]$entry.Value
+            $argumentList += "`"$($entry.Value)`""
         }
     }
 
@@ -164,7 +164,7 @@ New-ItemProperty -Path $UninstallRegPath -Name 'Publisher'            -PropertyT
 New-ItemProperty -Path $UninstallRegPath -Name 'InstallLocation'      -PropertyType String -Value $InstallDir -Force | Out-Null
 New-ItemProperty -Path $UninstallRegPath -Name 'UninstallString'      -PropertyType String -Value $uninstallCmd -Force | Out-Null
 New-ItemProperty -Path $UninstallRegPath -Name 'QuietUninstallString' -PropertyType String -Value $quietUninstallCmd -Force | Out-Null
-New-ItemProperty -Path $UninstallRegPath -Name 'DisplayIcon'          -PropertyType String -Value $TargetDll -Force | Out-Null
+New-ItemProperty -Path $UninstallRegPath -Name 'DisplayIcon'          -PropertyType String -Value "$env:WINDIR\System32\osk.exe,0" -Force | Out-Null
 New-ItemProperty -Path $UninstallRegPath -Name 'NoModify'             -PropertyType DWord  -Value 1 -Force | Out-Null
 New-ItemProperty -Path $UninstallRegPath -Name 'NoRepair'             -PropertyType DWord  -Value 1 -Force | Out-Null
 
