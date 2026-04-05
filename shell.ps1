@@ -19,7 +19,7 @@ if (-not $needEnv) {
 $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
 
 if (Test-Path $vswhere) {
-    $vsInstallPath = & $vswhere -latest -property installationPath 2>$null
+    $vsInstallPath = & $vswhere -latest -products '*' -property installationPath 2>$null
     if ($vsInstallPath) {
         $vcvarsall = Join-Path $vsInstallPath 'VC\Auxiliary\Build\vcvarsall.bat'
     }
