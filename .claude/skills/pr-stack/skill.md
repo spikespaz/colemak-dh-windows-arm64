@@ -23,11 +23,22 @@ When GitHub performs a rebase merge on PR N, it replays N's commits onto the tar
 
 ## Procedure
 
-### 1. Identify logical PRs and their commits
+### 1. Fetch and assess before reorganizing
+
+Before closing, creating, or restructuring any PRs, fetch main and check what's already merged:
+
+```bash
+git fetch origin main
+git log --oneline origin/main
+```
+
+Rebase existing branches onto `origin/main` first. Commits already on main will drop, revealing which branches are empty or reduced. Only then decide which PRs to close, keep, or create. Reorganizing before this step wastes PRs — you may close a PR and create a new one only to discover they're identical after rebase.
+
+### 2. Identify logical PRs and their commits
 
 Map each commit to exactly one PR by semantic concern. A commit belongs to the PR whose purpose it serves, not the branch it happened to land on during development.
 
-### 2. Determine dependency order
+### 3. Determine dependency order
 
 Build the dependency graph:
 - If PR B modifies or depends on files introduced by PR A, B must come after A.
@@ -35,7 +46,7 @@ Build the dependency graph:
 
 Flatten into a linear chain: `main → PR1 → PR2 → PR3 → ...`
 
-### 3. Create branches by cherry-pick
+### 4. Create branches by cherry-pick
 
 For each PR in order:
 
@@ -51,7 +62,7 @@ git cherry-pick <commit3> <commit4> ...
 
 Cherry-pick (not rebase) when constructing from scratch — it's explicit about which commits go where.
 
-### 4. Set PR bases on GitHub
+### 5. Set PR bases on GitHub
 
 Each PR's base branch is its prerequisite PR branch, not main (except the first). This scopes GitHub's diff view to only that PR's commits.
 
@@ -59,7 +70,7 @@ Each PR's base branch is its prerequisite PR branch, not main (except the first)
 gh pr edit <number> --base u/<user>/<prerequisite-branch>
 ```
 
-### 5. Create a dev branch for CI
+### 6. Create a dev branch for CI
 
 The dev branch sits at the tip of the stack (same as the last PR branch) or is an octopus merge of all PR branches. It exists for CI validation only — never merge it.
 
@@ -70,7 +81,7 @@ git push origin u/<user>/dev
 
 Open a PR for it to trigger CI, or use `gh workflow run` for manual dispatch. The PR body should list the merge order and note that it should not be merged directly.
 
-### 6. Merge in order
+### 7. Merge in order
 
 **WARNING: PR bases point to prerequisite branches, not main. GitHub merges into the base branch. Merging out of order will land commits on a feature branch instead of main.**
 
