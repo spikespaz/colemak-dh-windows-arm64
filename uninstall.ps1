@@ -125,8 +125,11 @@ if (Test-Path $TargetDll) {
     }
 }
 
+$InstalledNote = Join-Path $InstallDir 'NOTE.txt'
+
 $cleanupCmd = @"
 timeout /t 2 /nobreak >nul
+del /f /q "$InstalledNote" 2>nul
 del /f /q "$InstalledUninstallScript"
 rmdir "$InstallDir" 2>nul
 "@
