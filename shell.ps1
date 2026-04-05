@@ -16,10 +16,17 @@ if (-not $needEnv) {
     return
 }
 
-$vcvarsall = 'C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\VC\Auxiliary\Build\vcvarsall.bat'
+$vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
 
-if (-not (Test-Path $vcvarsall)) {
-    throw "vcvarsall.bat not found at: $vcvarsall"
+if (Test-Path $vswhere) {
+    $vsInstallPath = & $vswhere -latest -property installationPath 2>$null
+    if ($vsInstallPath) {
+        $vcvarsall = Join-Path $vsInstallPath 'VC\Auxiliary\Build\vcvarsall.bat'
+    }
+}
+
+if (-not $vcvarsall -or -not (Test-Path $vcvarsall)) {
+    throw "vcvarsall.bat not found. Install Visual Studio or Build Tools with the C++ ARM64 workload."
 }
 
 $envDump = cmd /c "`"$vcvarsall`" arm64 >nul && set"
