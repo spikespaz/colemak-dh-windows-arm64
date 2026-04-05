@@ -73,7 +73,11 @@ Copy-Item $UninstallScript (Join-Path $OutputDir 'uninstall.ps1') -Force
 $NoteFile = Join-Path $OutputDir 'NOTE.txt'
 @"
 The file $OutputBase.dll included here is a reference copy of the DLL
-installed to %WINDIR%\System32. It is not used at runtime.
+installed to %WINDIR%\System32\$OutputBase.dll. It is not used at runtime.
+
+To uninstall, either:
+- Run: powershell -ExecutionPolicy Bypass -File uninstall.ps1
+- Or: Settings → Apps → Installed apps → Colemak-DH (US) → ... → Uninstall
 
 Source: https://github.com/spikespaz/colemak-dh-windows-arm64
 "@ | Set-Content -Path $NoteFile -Encoding UTF8

@@ -120,7 +120,7 @@ if ($targetExists -and $targetHash -eq $sourceHash -and $layoutOwned -and $unins
         }
         catch {
             if (-not $layoutOwned -and -not $uninstallOwned) {
-                throw "$DllName is pending deletion from a previous uninstall. Reboot before reinstalling."
+                throw "$DllName is pending deletion from a previous uninstall. Reboot, or switch to another layout (Super+Space) and uninstall again, before reinstalling."
             }
 
             $stagedDll = Join-Path $InstallDir $DllName
