@@ -121,6 +121,7 @@ if (Test-Path $TargetDll) {
     }
     catch {
         Write-Warning "Could not remove DLL immediately. Scheduled deletion on reboot."
+        Write-Warning "You must reboot before reinstalling the layout."
         Move-FileOnReboot $TargetDll
     }
 }
