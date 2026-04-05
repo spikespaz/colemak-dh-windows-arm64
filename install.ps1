@@ -167,6 +167,7 @@ New-ItemProperty -Path $UninstallRegPath -Name 'QuietUninstallString' -PropertyT
 New-ItemProperty -Path $UninstallRegPath -Name 'DisplayIcon'          -PropertyType String -Value "$env:WINDIR\System32\ddores.dll,30" -Force | Out-Null
 New-ItemProperty -Path $UninstallRegPath -Name 'NoModify'             -PropertyType DWord  -Value 1 -Force | Out-Null
 New-ItemProperty -Path $UninstallRegPath -Name 'NoRepair'             -PropertyType DWord  -Value 1 -Force | Out-Null
+New-ItemProperty -Path $UninstallRegPath -Name 'EstimatedSize'        -PropertyType DWord  -Value ([math]::Ceiling((Get-Item $SourceDll).Length / 1KB)) -Force | Out-Null
 
 if (-not $Silent) {
     Write-Host "Installed or repaired." -ForegroundColor Green
