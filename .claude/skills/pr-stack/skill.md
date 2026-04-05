@@ -72,13 +72,29 @@ Open a PR for it to trigger CI, or use `gh workflow run` for manual dispatch. Th
 
 ### 6. Merge in order
 
-Merge PRs sequentially via rebase merge:
+**WARNING: PR bases point to prerequisite branches, not main. GitHub merges into the base branch. Merging out of order will land commits on a feature branch instead of main.**
 
-1. Merge PR1 into main (rebase merge)
-2. PR2's base automatically becomes main — its commits replay with preserved hashes
-3. Repeat for PR3, PR4, ...
+Merge PRs sequentially via rebase merge, strictly in stack order:
 
-After each merge, the next PR in the stack should show no conflicts and a clean diff.
+1. Merge PR1 (base: main) into main via rebase merge
+2. GitHub auto-retargets PR2's base from PR1's branch to main (because PR1's branch is now merged)
+3. Merge PR2 — its commits replay onto main with preserved hashes
+4. Repeat for PR3, PR4, ...
+
+If GitHub does not auto-retarget (e.g., the prerequisite branch was not deleted on merge), manually re-point the base to main before merging:
+
+```bash
+gh pr edit <number> --base main
+```
+
+**Never merge a PR before its prerequisites are merged.** The result is a merge into a feature branch, not main — silently wrong and hard to undo.
+
+When presenting the stack to the user, always include the merge order and this warning. Example PR body:
+
+```
+## Merge order
+**Nth in stack** — merge #M first, then this PR. Do not merge out of order.
+```
 
 ## Rebasing an existing stack onto updated main
 
