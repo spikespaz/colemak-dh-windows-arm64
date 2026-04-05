@@ -1,5 +1,7 @@
 [CmdletBinding()]
-param()
+param(
+    [switch]$SkipArchive
+)
 
 $ErrorActionPreference = 'Stop'
 
@@ -70,11 +72,13 @@ Copy-Item $UninstallScript (Join-Path $OutputDir 'uninstall.ps1') -Force
 
 Write-Host "Built: $OutputDLL" -ForegroundColor Green
 
-$ArchivePath = Join-Path $OutputDir "$OutputBase-${OutputArch}.zip"
+if (-not $SkipArchive) {
+    $ArchivePath = Join-Path $OutputDir "$OutputBase-${OutputArch}.zip"
 
-Compress-Archive `
-    -Path (Join-Path $OutputDir '*') `
-    -DestinationPath $ArchivePath `
-    -CompressionLevel Optimal
+    Compress-Archive `
+        -Path (Join-Path $OutputDir '*') `
+        -DestinationPath $ArchivePath `
+        -CompressionLevel Optimal
 
-Write-Host "Archived: $ArchivePath" -ForegroundColor Green
+    Write-Host "Archived: $ArchivePath" -ForegroundColor Green
+}
