@@ -59,11 +59,11 @@ Add-Type -Namespace Win32 -Name Native -MemberDefinition @'
 public static extern bool MoveFileEx(string lpExistingFileName, string lpNewFileName, int dwFlags);
 '@
 
-function Move-FileOnReboot([string]$ExistingPath, [string]$NewPath = $null) {
+function Move-FileOnReboot([string]$ExistingPath, $NewPath = [NullString]::Value) {
     $MOVEFILE_REPLACE_EXISTING = 0x1
     $MOVEFILE_DELAY_UNTIL_REBOOT = 0x4
     $flags = $MOVEFILE_DELAY_UNTIL_REBOOT
-    if ($NewPath) { $flags = $flags -bor $MOVEFILE_REPLACE_EXISTING }
+    if ($NewPath -ne [NullString]::Value) { $flags = $flags -bor $MOVEFILE_REPLACE_EXISTING }
 
     if (-not [Win32.Native]::MoveFileEx($ExistingPath, $NewPath, $flags)) {
         $code = [Runtime.InteropServices.Marshal]::GetLastWin32Error()
