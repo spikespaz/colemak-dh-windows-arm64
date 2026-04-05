@@ -41,6 +41,10 @@ When multiple PRs are in flight, stack them as a linear chain for rebase merge:
 - **Set PR base branches accordingly.** Each PR's base is its prerequisite PR branch, not master (except the first). This keeps GitHub's diff scoped to that PR's commits only. The user may override this. After merging PRs and rebalancing the stack, suggest re-pointing remaining bases to master where prerequisites are now merged.
 - **Dev branch is optional.** For stacks of 3 or fewer PRs, trigger CI with `gh workflow run` or push individual PR branches. For 4+ PRs, suggest a dev branch at the tip for CI validation. If created, it is never merged — individual PRs are merged in order.
 
+## Documentation
+
+- **Link rendered versions after pushing.** When documentation changes are pushed (README, markdown files), provide a GitHub link to the rendered version of each affected file so the user can verify formatting visually: `https://github.com/<owner>/<repo>/blob/<branch>/<file>#<section>`.
+
 ## Skill Provenance
 
 The `pathwise-commit` and `pathwise-audit` skills originate from [spikespaz/claude](https://github.com/spikespaz/claude). When updating these skills, check the source repo for newer versions.
