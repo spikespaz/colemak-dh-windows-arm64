@@ -24,7 +24,7 @@ if (-not $Elevated -and
 
     $argumentList = @(
         '-ExecutionPolicy', 'Bypass',
-        '-File', $PSCommandPath,
+        '-File', "`"$PSCommandPath`"",
         '-Elevated'
     )
 
@@ -34,7 +34,7 @@ if (-not $Elevated -and
         $argumentList += "-$($entry.Key)"
 
         if ($entry.Value -isnot [System.Management.Automation.SwitchParameter]) {
-            $argumentList += [string]$entry.Value
+            $argumentList += "`"$($entry.Value)`""
         }
     }
 
