@@ -107,14 +107,16 @@ When presenting the stack to the user, always include the merge order and this w
 **Nth in stack** — merge #M first, then this PR. Do not merge out of order.
 ```
 
-## Rebasing an existing stack onto updated main
+## Cascade discipline
 
-When main moves forward (from merges or other work):
+**Rebasing one branch requires rebasing every downstream branch, rebuilding dev, updating PR metadata, and pushing — as a single atomic operation.** Doing any of these steps in isolation leaves the stack in an inconsistent state.
+
+The full cascade after any change:
 
 ```bash
 git fetch origin main
 
-# Rebase each branch in order
+# 1. Rebase each branch in order
 git checkout u/<user>/<pr1-name>
 git rebase origin/main
 
@@ -123,11 +125,27 @@ git rebase u/<user>/<pr1-name>
 
 # ... continue for each branch
 
-# Force-push all at once
-git push origin u/<user>/<pr1-name> u/<user>/<pr2-name> ... --force-with-lease
+# 2. Rebuild dev at the tip
+git checkout u/<user>/dev
+git reset --hard u/<user>/<last-pr-branch>
+
+# 3. Push all at once
+git push origin u/<user>/<pr1-name> u/<user>/<pr2-name> ... u/<user>/dev --force-with-lease
+
+# 4. Update PR metadata (see below)
 ```
 
 Git will automatically skip commits that are already on main (e.g., from a previously merged PR). If a branch becomes empty after rebase, its PR is effectively merged — close it.
+
+### `--force-with-lease` rejection after external merge
+
+When GitHub merges a PR (or the user merges manually on the web), the remote branch SHA changes in a way the local tracking ref doesn't know about. `--force-with-lease` will reject the push for that specific branch. Use `--force` for the affected branch only — not as a blanket flag:
+
+```bash
+# Only for the branch GitHub mutated
+git push origin u/<user>/<branch> --force
+# All others still use --force-with-lease
+```
 
 ## Handling empty PRs
 
@@ -135,10 +153,14 @@ When a PR's commits are already on main (from a prior merge that included them),
 
 ## Updating PR metadata
 
-After any rebase or restructure, update:
+**This is a blocking step — do not push without updating metadata.** Every rebase cascade makes PR metadata stale. After any rebase or restructure, update all of the following before pushing:
+
 - PR titles to match their actual content
-- PR bodies with current merge order and predecessor references
+- PR bodies with current merge order, predecessor references, and the merge-order warning
 - PR base branches if the stack order changed
+- Remove stale notes (e.g., "PR #X closed" if it was reopened)
+
+Stale metadata is how PRs get merged into the wrong branch — the body says one thing, the base says another, and the user trusts the body.
 
 ## Audit on every commit
 
