@@ -301,6 +301,12 @@ hm-mod: monitors: size: make this option readOnly
 - **`impl` for new functions**: name functions in path segments via `+`, with a purpose clause: `lib: lpad+rpad: impl for padding`. Names in the path are scannable in `git log`; the `for` clause explains why they belong in one commit. For single functions, the name can be a path segment or in the description: `lib: math: round: impl with decimal precision arg`.
 - **Common verbs**: `enable`, `disable`, `set`, `update`, `override`, `wrap`, `migrate`, `add`, `remove`, `init`, `patch`, `increase`, `decrease`, `impl`.
 
+### GitHub Actions / CI
+
+- **`workflows:` or `gh:` scopes `.github/workflows/` changes** — not `ci:`. `ci:` is a Conventional Commits prefix; Pathwise uses the actual path or a recognizable abbreviation. Sub-scope by workflow filename without extension: `workflows: build-windows-arm64: init`.
+- **Do not use `ci:` as a path segment.** If the repository has CI configuration outside `.github/workflows/` (e.g., `.circleci/`, `.gitlab-ci.yml`), use the actual directory or file as the segment.
+- **Common verbs**: `init`, `add`, `remove`, `restrict`, `enable`, `disable`, `pin`.
+
 ## Temporary Commits and Rebase Prefixes
 
 Pathwise summaries integrate naturally with `rebase`-centric workflows. During a session, the agent may create **temporary commits** — small, incremental snapshots of work that are not yet final. These use single-letter prefixes matching `git rebase -i` commands to signal their intended fate:
