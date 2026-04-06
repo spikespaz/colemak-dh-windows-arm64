@@ -10,18 +10,13 @@ Homepage: <https://colemakmods.github.io/mod-dh>
 
 This repository: <https://github.com/spikespaz/colemak-dh-windows-arm64>
 
-## Prerequisites:
+## Prerequisites
 
-### Visual Studio Build Tools for ARM64
+### Visual Studio with C++ ARM64 tools
 
-1. Visit <https://my.visualstudio.com/downloads>
-2. Search "Build Tools for Visual Studio 2026"
-3. Change the "Architecture" column to `arm64`, download
-5. Open PowerShell, and `cd ~\Downloads`
-6. Run [VS Build Tools Install Command](#vs-build-tools-install-command)
+Any edition (Community, Enterprise, or Build Tools) works — `shell.ps1` finds it via `vswhere.exe`.
 
-<details>
-<summary id="vs-build-tools-install-command"><b>VS Build Tools Install Command</b></summary>
+Install with at least these components:
 
 ```ps
 .\vs_BuildTools.exe `
@@ -31,22 +26,21 @@ This repository: <https://github.com/spikespaz/colemak-dh-windows-arm64>
    --add Microsoft.VisualStudio.Component.Windows11SDK.22621 `
    --passive --wait --norestart
 ```
-</details>
 
 ### Microsoft Keyboard Layout Creator 1.4
 
 1. Visit <https://www.microsoft.com/en-us/download/details.aspx?id=102134>
 2. Download, run (extract), and start `setup.exe`
 
-## Building:
+## Building
 
 1. Install [prerequisites](#prerequisites)
 2. Clone this repository
 3. Open PowerShell, `cd` to this project
-2. Run `. .\shell.ps1`
-4. Run `.\build.ps1`
+4. Run `. .\shell.ps1`
+5. Run `.\build.ps1`
 
-Portable installer files are in `output/`.
+Installer files are in `output/`.
 
 ## Installing
 
@@ -65,7 +59,7 @@ Then reboot.
 1. Open PowerShell, `cd` to this project
 2. [Build `colemak_dh_ansi_us.dll`](#building)
 3. Run `cd output`
-4. Run `powershell -ExecutionPolicy Bypass -File .\install.ps1`
+4. Run `.\install.ps1` (or `powershell -ExecutionPolicy Bypass -File .\install.ps1` if downloaded from CI)
 5. Reboot
 
 You can now switch between your default layout and Colemak-DH with <kbd>Super</kbd>+<kbd>Space</kbd>.
