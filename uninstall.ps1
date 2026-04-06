@@ -56,24 +56,30 @@ if (-not $Elevated -and
         Write-Host "Or press Ctrl+C to keep the reboot-scheduled deletion." -ForegroundColor Yellow
         Read-Host
 
-        $logFile = Join-Path ([IO.Path]::GetTempPath()) "colemak-dh-uninstall-$PID.log"
-        $retryArgs = @(
-            '-ExecutionPolicy', 'Bypass',
-            '-File', "`"$PSCommandPath`"",
-            '-Elevated', '-DllOnly',
-            '-LogFile', "`"$logFile`"",
-            '-DllName', "`"$DllName`""
-        )
+        for ($attempt = 1; $attempt -le 2; $attempt++) {
+            $logFile = Join-Path ([IO.Path]::GetTempPath()) "colemak-dh-uninstall-$PID.log"
 
-        $proc = Start-Process powershell.exe `
-            -Verb RunAs `
-            -ArgumentList $retryArgs `
-            -Wait `
-            -PassThru
+            $retryArgs = @(
+                '-ExecutionPolicy', 'Bypass',
+                '-File', "`"$PSCommandPath`"",
+                '-Elevated', '-DllOnly',
+                '-LogFile', "`"$logFile`"",
+                '-DllName', "`"$DllName`""
+            )
 
-        if (Test-Path $logFile) {
-            Get-Content $logFile | ForEach-Object { Write-Host $_ }
-            Remove-Item $logFile -ErrorAction SilentlyContinue
+            $proc = Start-Process powershell.exe `
+                -Verb RunAs `
+                -ArgumentList $retryArgs `
+                -Wait `
+                -PassThru
+
+            if (Test-Path $logFile) {
+                Get-Content $logFile | ForEach-Object { Write-Host $_ }
+                Remove-Item $logFile -ErrorAction SilentlyContinue
+            }
+
+            if ($proc.ExitCode -ne 2) { break }
+            if ($attempt -lt 2) { Start-Sleep -Milliseconds 500 }
         }
     }
 
@@ -172,13 +178,28 @@ if (-not $DllOnly) {
 }
 
 if ($dllExists) {
-    try {
-        Remove-Item $TargetDll -Force
+    $removed = $false
+    for ($attempt = 1; $attempt -le 2; $attempt++) {
+        try {
+            Remove-Item $TargetDll -Force
+            $removed = $true
+            break
+        }
+        catch {
+            if ($attempt -lt 2) { Start-Sleep -Milliseconds 500 }
+        }
     }
-    catch {
+
+    if (-not $removed) {
         Write-Log "Could not remove DLL -- it is in use." -Warning
-        Move-FileOnReboot $TargetDll
-        Write-Log "Scheduled deletion on reboot as fallback."
+        try {
+            Move-FileOnReboot $TargetDll
+            Write-Log "Scheduled deletion on reboot as fallback."
+        }
+        catch {
+            Write-Log "DLL is already pending deletion from a previous uninstall." -Warning
+            Write-Log "Switch to another layout (Super+Space) and try again, or reboot." -Warning
+        }
         exit 2
     }
 }
