@@ -8,6 +8,7 @@ param(
     [string]$InstallDir = "$env:ProgramFiles\Colemak-DH (US)",
     [switch]$AddToCurrentUserPreload,
 	[switch]$Silent,
+	[string]$LogFile,
 	[switch]$Elevated
 )
 
@@ -19,17 +20,19 @@ if (-not $Elevated -and
 
     if (-not $Silent) {
         Write-Host "Requesting administrative privileges..."
-        Write-Host "Waiting for elevated process to complete..."
     }
+
+    $logFile = Join-Path ([IO.Path]::GetTempPath()) "colemak-dh-install-$PID.log"
 
     $argumentList = @(
         '-ExecutionPolicy', 'Bypass',
         '-File', "`"$PSCommandPath`"",
-        '-Elevated'
+        '-Elevated',
+        '-LogFile', "`"$logFile`""
     )
 
     foreach ($entry in $PSBoundParameters.GetEnumerator()) {
-        if ($entry.Key -in @('Elevated')) { continue }
+        if ($entry.Key -in @('Elevated', 'LogFile')) { continue }
 
         $argumentList += "-$($entry.Key)"
 
@@ -44,15 +47,30 @@ if (-not $Elevated -and
         -Wait `
         -PassThru
 
-    if (-not $Silent) {
-        Write-Host ""
-        Write-Host "Elevated process exited with code $($proc.ExitCode)"
+    if (-not $Silent -and (Test-Path $logFile)) {
+        Get-Content $logFile | ForEach-Object { Write-Host $_ }
+        Remove-Item $logFile -ErrorAction SilentlyContinue
+    }
+
+    if (-not $Silent -and $proc.ExitCode -ne 0) {
+        Write-Host "Elevated process exited with code $($proc.ExitCode)" -ForegroundColor Red
     }
 
     exit $proc.ExitCode
 }
 
 $ErrorActionPreference = 'Stop'
+
+function Write-Log {
+    param([string]$Message, [ConsoleColor]$Color = 'White', [switch]$Warning)
+    if ($Warning) { Write-Warning $Message } else { Write-Host $Message -ForegroundColor $Color }
+    if ($LogFile) { Add-Content -Path $LogFile -Value $Message }
+}
+
+trap {
+    if ($LogFile) { Add-Content -Path $LogFile -Value "ERROR: $_" }
+    break
+}
 
 Add-Type -Namespace Win32 -Name Native -MemberDefinition @'
 [System.Runtime.InteropServices.DllImport("kernel32.dll", SetLastError=true, CharSet=System.Runtime.InteropServices.CharSet.Unicode)]
@@ -106,7 +124,7 @@ $layoutOwned =
 $uninstallOwned = Test-Path $UninstallRegPath
 
 if ($targetExists -and $targetHash -eq $sourceHash -and $layoutOwned -and $uninstallOwned) {
-    Write-Host "Already installed." -ForegroundColor Yellow
+    Write-Log "Already installed." -Color Yellow
 } else {
     Ensure-Dir $InstallDir
     Copy-Item $SourceUninstallScript $InstalledUninstallScript -Force
@@ -125,7 +143,7 @@ if ($targetExists -and $targetHash -eq $sourceHash -and $layoutOwned -and $unins
 
             $stagedDll = Join-Path $InstallDir $DllName
             Copy-Item $SourceDll $stagedDll -Force
-            Write-Warning "Could not replace loaded DLL immediately. Scheduled replacement on reboot."
+            Write-Log "Could not replace loaded DLL immediately. Scheduled replacement on reboot." -Warning
             Move-FileOnReboot $stagedDll $TargetDll
         }
     }
@@ -173,8 +191,9 @@ $installedBytes = (Get-Item $SourceDll).Length + (Get-Item $SourceUninstallScrip
 if (Test-Path $SourceNote) { $installedBytes += (Get-Item $SourceNote).Length }
 New-ItemProperty -Path $UninstallRegPath -Name 'EstimatedSize'        -PropertyType DWord  -Value ([math]::Ceiling($installedBytes / 1KB)) -Force | Out-Null
 
-if (-not $Silent) {
-    Write-Host "Installed or repaired." -ForegroundColor Green
-    Write-Host "Sign out and sign back in, or reboot, if the layout was in use." -ForegroundColor Green
+Write-Log "Installed or repaired." -Color Green
+Write-Log "Sign out and sign back in, or reboot, if the layout was in use." -Color Green
+
+if (-not $Silent -and -not $LogFile) {
     Read-Host "Press Enter to close"
 }
