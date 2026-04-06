@@ -124,7 +124,7 @@ $layoutOwned =
 $uninstallOwned = Test-Path $UninstallRegPath
 
 if ($targetExists -and $targetHash -eq $sourceHash -and $layoutOwned -and $uninstallOwned) {
-    Write-Log "Already installed." -Color Yellow
+    Write-Log "Already installed (DLL unchanged)." -Color Yellow
 } else {
     Ensure-Dir $InstallDir
     Copy-Item $SourceUninstallScript $InstalledUninstallScript -Force

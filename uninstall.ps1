@@ -148,21 +148,30 @@ function Remove-CurrentUserPreloadEntry {
     }
 }
 
+$layoutExists = Test-Path $LayoutRegPath
+$uninstallExists = Test-Path $UninstallRegPath
+$dllExists = Test-Path $TargetDll
+
+if (-not $DllOnly -and -not $layoutExists -and -not $uninstallExists -and -not $dllExists) {
+    Write-Log "Not installed." -Color Yellow
+    exit 0
+}
+
 if (-not $DllOnly) {
     if ($RemoveFromCurrentUserPreload) {
         Remove-CurrentUserPreloadEntry
     }
 
-    if (Test-Path $LayoutRegPath) {
+    if ($layoutExists) {
         Remove-Item -Path $LayoutRegPath -Recurse -Force
     }
 
-    if (Test-Path $UninstallRegPath) {
+    if ($uninstallExists) {
         Remove-Item -Path $UninstallRegPath -Recurse -Force
     }
 }
 
-if (Test-Path $TargetDll) {
+if ($dllExists) {
     try {
         Remove-Item $TargetDll -Force
     }
