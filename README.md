@@ -29,8 +29,18 @@ Install with at least these components:
 
 ### Microsoft Keyboard Layout Creator 1.4
 
-1. Visit <https://www.microsoft.com/en-us/download/details.aspx?id=102134>
-2. Download, run (extract), and start `setup.exe`
+1. Download [MSKLC.exe](https://www.microsoft.com/en-us/download/details.aspx?id=102134)
+2. Extract it: `.\MSKLC.exe -y -o MSKLC`
+3. Admin-install the MSI (bypasses .NET 3.5 dependency):
+   ```ps
+   msiexec /a MSKLC\MSKLC\MSKLC.msi /qn TARGETDIR="$PWD\msklc-install"
+   ```
+4. Copy `kbdutool.exe` and its dependencies to the expected path:
+   ```ps
+   $dst = 'C:\Program Files (x86)\Microsoft Keyboard Layout Creator 1.4\bin\i386'
+   New-Item -ItemType Directory -Force $dst | Out-Null
+   Copy-Item msklc-install\pfiles\MSKLC\bin\i386\* $dst -Force
+   ```
 
 ## Building
 
