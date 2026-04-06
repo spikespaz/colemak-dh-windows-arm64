@@ -25,3 +25,4 @@ The skill file teaches the format. These guidelines teach judgment:
 - **Granularity is the real discipline.** The format is easy. Committing every edit, immediately, with the right scope — that is the hard part. Default to smaller commits. If you catch yourself batching, stop and commit what you have.
 - **The history is the deliverable.** A clean history with well-scoped commits is more valuable than the final file state. When in doubt, make the history more granular, not less.
 - **Never assume the environment.** Ask before using tools, interpreters, or services that haven't been confirmed available. This applies to subagents too.
+- **Always end files with a newline.** Every file must have a trailing newline at EOF. No exceptions.
