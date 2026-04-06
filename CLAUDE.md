@@ -39,7 +39,7 @@ When multiple PRs are in flight, stack them as a linear chain for rebase merge:
 
 - **Each branch contains only its own commits.** Fork from the prerequisite PR branch (or master for the first in the stack), and cherry-pick or rebase only the commits that belong to that PR. Do not let shared history leak across branches. The user may override this on a case-by-case basis.
 - **Order branches by dependency, then by logical sequence.** If PR B depends on files introduced by PR A, B's branch is based on A's. Independent PRs slot into the chain wherever they fit logically. The goal: rebase-merging PRs in order produces a clean linear history where commit hashes are preserved through each merge.
-- **Set PR base branches accordingly.** Each PR's base is its prerequisite PR branch, not master (except the first). This keeps GitHub's diff scoped to that PR's commits only. The user may override this. After merging PRs and rebalancing the stack, suggest re-pointing remaining bases to master where prerequisites are now merged.
+- **All PR bases are master.** GitHub merges into the base branch — using prerequisite branches as bases causes commits to land on feature branches when merged out of order. Merge order is enforced by convention (documented in PR bodies), not by base targeting.
 - **Dev branch is optional.** For stacks of 3 or fewer PRs, trigger CI with `gh workflow run` or push individual PR branches. For 4+ PRs, suggest a dev branch at the tip for CI validation. If created, it is never merged — individual PRs are merged in order.
 
 ## Documentation

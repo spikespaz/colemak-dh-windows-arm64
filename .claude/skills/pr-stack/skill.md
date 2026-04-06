@@ -64,10 +64,10 @@ Cherry-pick (not rebase) when constructing from scratch — it's explicit about 
 
 ### 5. Set PR bases on GitHub
 
-Each PR's base branch is its prerequisite PR branch, not main (except the first). This scopes GitHub's diff view to only that PR's commits.
+Every PR's base branch is main/master. GitHub performs rebase merge into the base branch — setting a prerequisite branch as the base causes commits to land on the wrong branch when merged out of order. The merge order is enforced by convention (documented in PR bodies), not by base branch targeting.
 
 ```bash
-gh pr edit <number> --base u/<user>/<prerequisite-branch>
+gh pr edit <number> --base main
 ```
 
 ### 6. Create a dev branch for CI
@@ -83,24 +83,15 @@ Open a PR for it to trigger CI, or use `gh workflow run` for manual dispatch. Th
 
 ### 7. Merge in order
 
-**WARNING: PR bases point to prerequisite branches, not main. GitHub merges into the base branch. Merging out of order will land commits on a feature branch instead of main.**
-
 Merge PRs sequentially via rebase merge, strictly in stack order:
 
-1. Merge PR1 (base: main) into main via rebase merge
-2. GitHub auto-retargets PR2's base from PR1's branch to main (because PR1's branch is now merged)
-3. Merge PR2 — its commits replay onto main with preserved hashes
-4. Repeat for PR3, PR4, ...
+1. Merge PR1 into main via rebase merge
+2. Merge PR2 — its commits replay onto main with preserved hashes (since PR2's branch was rebased on PR1's tip, and PR1 is now on main)
+3. Repeat for PR3, PR4, ...
 
-If GitHub does not auto-retarget (e.g., the prerequisite branch was not deleted on merge), manually re-point the base to main before merging:
+**Never merge a PR before its prerequisites are merged.** The prerequisite's commits are not yet on main, so the dependent PR's commits won't replay cleanly — GitHub may report conflicts or produce duplicate commits.
 
-```bash
-gh pr edit <number> --base main
-```
-
-**Never merge a PR before its prerequisites are merged.** The result is a merge into a feature branch, not main — silently wrong and hard to undo.
-
-When presenting the stack to the user, always include the merge order and this warning. Example PR body:
+When presenting the stack to the user, always include the merge order. Example PR body:
 
 ```
 ## Merge order
