@@ -153,6 +153,8 @@ When a PR's commits are already on main (from a prior merge that included them),
 
 Stale metadata is how PRs get merged into the wrong branch — the body says one thing, the base says another, and the user trusts the body.
 
+**Check top-level PR comments too.** Review threads on diffs are visible per-commit, but top-level comments (on the PR conversation tab) are easy to miss. Before declaring a PR ready for merge, check `gh api repos/{owner}/{repo}/issues/{number}/comments` for unresolved feedback.
+
 ## Audit on every commit
 
 Every commit created or modified during stacking must pass a pathwise audit (see `pathwise-audit` skill) before it is pushed. This applies to:
