@@ -128,15 +128,11 @@ git push origin u/<user>/<pr1-name> u/<user>/<pr2-name> ... u/<user>/dev --force
 
 Git will automatically skip commits that are already on main (e.g., from a previously merged PR). If a branch becomes empty after rebase, its PR is effectively merged — close it.
 
-### `--force-with-lease` rejection after external merge
+### `--force-with-lease` rejection
 
-When GitHub merges a PR (or the user merges manually on the web), the remote branch SHA changes in a way the local tracking ref doesn't know about. `--force-with-lease` will reject the push for that specific branch. Use `--force` for the affected branch only — not as a blanket flag:
+If `--force-with-lease` rejects, the remote changed since your last fetch. Do not use `--force` to bypass this — it overwrites unseen remote changes, which is the exact scenario `--force-with-lease` prevents.
 
-```bash
-# Only for the branch GitHub mutated
-git push origin u/<user>/<branch> --force
-# All others still use --force-with-lease
-```
+Instead: `git fetch origin`, rebase onto the updated remote, then `--force-with-lease` succeeds naturally. The cascade procedure already requires fetching first — if followed correctly, this rejection should not occur.
 
 ## Handling empty PRs
 
