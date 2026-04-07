@@ -77,7 +77,7 @@ You can now switch between your default layout and Colemak-DH with <kbd>Super</k
 ## Uninstalling
 
 You can uninstall the layout the same way as with any other program.
-Go to *Settings* > *Apps* > *Installed apps* > scroll to *Colemak-DH (US)* > *...* > *Uninstall*, then reboot.
+Go to <kbd>Settings</kbd> → <kbd>Apps</kbd> → <kbd>Installed apps</kbd> → <kbd>Colemak-DH (US)</kbd> → <kbd>...</kbd> → <kbd>Uninstall</kbd>, then reboot.
 
 ## License
 

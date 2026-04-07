@@ -26,3 +26,26 @@ The skill file teaches the format. These guidelines teach judgment:
 - **The history is the deliverable.** A clean history with well-scoped commits is more valuable than the final file state. When in doubt, make the history more granular, not less.
 - **Never assume the environment.** Ask before using tools, interpreters, or services that haven't been confirmed available. This applies to subagents too.
 - **Always end files with a newline.** Every file must have a trailing newline at EOF. No exceptions.
+- **Audit your own commits.** The pathwise-audit skill applies to commits you produce, not just commits you review. Before every commit, test the summary against the full pathwise-commit spec — not just the "and" test, but naming, phrasing, granularity, mechanical consequences, and the "What NOT To Do" list. Do this incrementally: audit each commit as it is created or changed.
+
+## CI and Branch Management
+
+- **Push and iterate autonomously on feature branches.** Do not ask for confirmation before pushing, force-pushing (with lease), or re-running CI on non-main branches. The user expects you to drive the feedback loop.
+- **Clean up after merge.** Delete merged branches (local and remote) and rebase remaining branches onto updated master.
+
+### PR Stacking
+
+When multiple PRs are in flight, stack them as a linear chain for rebase merge:
+
+- **Each branch contains only its own commits.** Fork from the prerequisite PR branch (or master for the first in the stack), and cherry-pick or rebase only the commits that belong to that PR. Do not let shared history leak across branches. The user may override this on a case-by-case basis.
+- **Order branches by dependency, then by logical sequence.** If PR B depends on files introduced by PR A, B's branch is based on A's. Independent PRs slot into the chain wherever they fit logically. The goal: rebase-merging PRs in order produces a clean linear history where commit hashes are preserved through each merge.
+- **All PR bases are master.** GitHub merges into the base branch — using prerequisite branches as bases causes commits to land on feature branches when merged out of order. Merge order is enforced by convention (documented in PR bodies), not by base targeting.
+- **Dev branch is optional.** For stacks of 3 or fewer PRs, trigger CI with `gh workflow run` or push individual PR branches. For 4+ PRs, suggest a dev branch at the tip for CI validation. If created, it is never merged — individual PRs are merged in order.
+
+## Documentation
+
+- **Link rendered versions after pushing.** When documentation changes are pushed (README, markdown files), provide a GitHub link to the rendered version of each affected file so the user can verify formatting visually: `https://github.com/<owner>/<repo>/blob/<branch>/<file>#<section>`.
+
+## Skill Provenance
+
+The `pathwise-commit` and `pathwise-audit` skills originate from [spikespaz/claude](https://github.com/spikespaz/claude). When updating these skills, check the source repo for newer versions.
